@@ -20,62 +20,43 @@ path <- paste0("final/",locale[1], "/", extrF)
 #unzipping
 unzip(archv, files = c(path), junkpaths = TRUE, exdir = "data")
 
-#connecting
+#connecting----
 f <- paste0("data/", extrF)
 con <- file(f, "r")
 
-#sampling
-totalSize <- length(readLines(con))
-sampleSize <- 200
+#sampling----
 
-# creating a vector of 0s and 1s to decide to we take or not the line in sample
-set.seed(45678)
-v <- integer()
-for (i in 1:totalSize) {
-    v <- c(v, 
-           rbinom(1, 1, 0.01))
+closeAllConnections()
+#showConnections(all = TRUE)
+
+
+n <- 100000 #sample size
+prob <- 0.2 #probability for biased coin flip
+smpl <- character(0) #final sample
+
+#option 1 - this takes from diff parts of file, doesn't load the whole file, but takes around 100sec
+con <- file(f, open = "r")
+pts <- proc.time()
+while (length(smpl) < n & 
+       length(cur.line <- readLines(con, 1))) {
+    if(rbinom(1,1,prob)) {
+        smpl <- c(smpl, cur.line)
+    }
 }
-
-#reading line by line the 
-
-for (i in seq_along(v)) {
-    x <- c(x, i)
-}
-
-mean(v)
-hist(v)
-
-readLines(con, 1)
-
-
+proc.time() - pts
 close(con)
 
-#closing all connections just in case...
-closeAllConnections()
-showConnections(all = TRUE)
+#option 2 - this takes from diff parts of file, takes only 6sec, but loads the whole file (>300mb)
+con <- file(f, open = "r")
+pts <- proc.time()
+all <- readLines(con)
+smpl <- sample(all, n)
+proc.time() - pts
+close(con)
 
-
-
-
-
-
-
-
-#inspired by https://www.r-bloggers.com/random-sampling-of-plain-text-in-r/
-set.seed(456798)
-lines <- sample(totalSize, sampleSize)
-
-sample <- character()
-for (i in lines) {
-    add <- scan(con, what = "character", skip = i-1, 
-                nlines = 1, sep = "\n")
-    sample <- rbind(sample, add)
-}
-
-scan(con, what = "character", skip = 100000, 
-     nlines = 10, sep = "\n")
-
-
-
-
-
+#option 3 - this doesn't load the whole file, takes no time, but takes from beginning of the file
+con <- file(f, open = "r")
+pts <- proc.time()
+smpl <- readLines(con, 100000)
+proc.time() - pts
+close(con)
