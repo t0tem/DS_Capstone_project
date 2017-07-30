@@ -30,8 +30,7 @@ inspect(docs[[1]])
 #Removing punctuation:
 docs <- tm_map(docs, removePunctuation)
 inspect(docs[[1]])
-# writeLines(as.character(docs[1])) # Check to see if it worked.
-# The 'writeLines()' function is commented out to save space.
+
 
 #and special characters. removing with one regexp
 docs <- tm_map(docs, 
@@ -50,7 +49,6 @@ inspect(docs[[1]])
 #        )# This is an ascii character that did not translate, so it had to be removed.
 #    
 #}
-#writeLines(as.character(docs[1]))
 #inspect(docs[[2]]) #doesn't work any more as docs[[x]] is a "character" now, not "PlainTextDocument"
 
 
@@ -60,27 +58,15 @@ docs <- tm_map(docs, removeNumbers)
 
 #Converting to lowercase
 docs <- tm_map(docs, content_transformer(tolower))
-#docs <- tm_map(docs, PlainTextDocument)
-DocsCopy <- docs
-inspect(DocsCopy[[1]])
-inspect(docs[[1]])
-docs <- DocsCopy
+
+
 
 #Removing “stopwords” (common words)
-
-# For a list of the stopwords, see:   
-# length(stopwords("english"))   
-# stopwords("english")   
-
 docs <- tm_map(docs, removeWords, stopwords("english"))
-#docs <- tm_map(docs, PlainTextDocument)
-# writeLines(as.character(docs[1])) # Check to see if it worked.
 
 
 #Removing particular words:
 docs <- tm_map(docs, removeWords, c("syllogism", "tautology"))   
-# Just remove the words "syllogism" and "tautology". 
-# These words don't actually exist in these texts. But this is how you would remove them if they had.
 
 
 
@@ -108,17 +94,14 @@ docs <- tm_map(docs,
                                                     replacement = "politically_correct", 
                                                     x)))
 
-#docs <- tm_map(docs, PlainTextDocument)
-inspect(docs[[1]])
+#inspect(docs[[1]])
 
 
 #Removing common word endings (e.g., “ing”, “es”, “s”) - Stemming
 
-## Note: I did not run this section of code for this particular example.
 docs_st <- tm_map(docs, stemDocument)   
 #docs_st <- tm_map(docs_st, PlainTextDocument)
 inspect(docs_st[[1]]) # Check to see if it worked.
-# docs <- docs_st
 
 #add common endings to improve intrepretability.
 # This appears not to be working right now. You are welcome to try it, but there are numerous reports of 
@@ -157,10 +140,9 @@ length(freq)
 ord <- order(freq)   
 
 #export the matrix to Excel
-
-m <- as.matrix(dtm)   
-dim(m)
-write.csv(m, file="DocumentTermMatrix.csv")  
+#m <- as.matrix(dtm)   
+#dim(m)
+#write.csv(m, file="DocumentTermMatrix.csv")  
 
 
 ##############
@@ -173,20 +155,24 @@ dtms
     
 
 #Word Frequency
+
+#1
 freq <- colSums(as.matrix(dtm))
 head(table(freq), 20) 
-# The ", 20" indicates that we only want the first 20 frequencies. 
-#Feel free to change that number.
-tail(table(freq), 20)
+#tail(table(freq), 20)
 
+#2
 freq <- colSums(as.matrix(dtms))   
 freq   
 
+#3
 freq <- sort(colSums(as.matrix(dtm)), decreasing=TRUE)   
 head(freq, 14)   
 
+#4
 findFreqTerms(dtm, lowfreq=50)
 
+#5
 wf <- data.frame(word=names(freq), freq=freq)   
 head(wf)
 
@@ -219,17 +205,53 @@ findAssocs(dtms, "think", corlimit=0.70)
 
 library(wordcloud)
 set.seed(123)   
-wordcloud(names(freq), freq, min.freq=25)
+wordcloud(names(freq), freq, min.freq=100)
 
-set.seed(142)   
+set.seed(123)   
 wordcloud(names(freq), freq, max.words=100) 
 
 
-set.seed(142)   
+set.seed(123)   
 wordcloud(names(freq), freq, min.freq=20, scale=c(5, .1), 
           colors=brewer.pal(6, "Dark2"))  
 
 
-set.seed(142)   
+set.seed(123)   
 dark2 <- brewer.pal(6, "Dark2")   
 wordcloud(names(freq), freq, max.words=100, rot.per=0.2, colors=dark2)  
+
+################################
+# Clustering by Term Similarity
+################################
+
+#To do this well, you should always first remove a lot of the uninteresting or infrequent words. 
+#you can remove these with the following code.
+
+dtmss <- removeSparseTerms(dtm, 0.15) 
+# This makes a matrix that is only 15% empty space, maximum.   
+dtmss
+
+#Hierarchal Clustering
+
+#First calculate distance between words & then cluster them according to similarity.
+library(cluster)   
+d <- dist(t(dtmss), method="euclidian")   
+fit <- hclust(d=d, method="complete")   # for a different look: method="ward.D"
+fit  
+
+plot(fit, hang=-1)
+
+#let's look at 6 clusters level 
+plot.new()
+plot(fit, hang=-1)
+groups <- cutree(fit, k=6)   # "k=" defines the number of clusters you are using   
+rect.hclust(fit, k=6, border="red") # draw dendogram with red borders around the 6 clusters   
+
+###############################
+# K-means clustering
+###############################
+
+library(fpc)   
+d <- dist(t(dtmss), method="euclidian")   
+kfit <- kmeans(d, 2)   
+clusplot(as.matrix(d), kfit$cluster, color=T, shade=T, labels=2, lines=0)
