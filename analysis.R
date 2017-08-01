@@ -1,3 +1,12 @@
+# initiating a log file
+
+sink("log.txt", append = TRUE, split = TRUE)
+"Analysis started at"
+Sys.time()
+
+
+
+
 #loading libraries
 
 library(stringr)
@@ -58,13 +67,12 @@ twitter <- readLines(con, encoding = "UTF-8", skipNul = TRUE)
 close(con)
 
 #news[77259]
-
-str_replace_all(blogs[591457:591459], "[^[:graph:]]", " ")
+#str_replace_all(blogs[591457:591459], "[^[:graph:]]", " ") #for a test
 
 
 
 ## Sampling the files
-sampleSize <- 50000
+sampleSize <- 150000
 set.seed(456789)
 sampleN <- sample(news, sampleSize)
 sampleB <- sample(blogs, sampleSize)
@@ -92,11 +100,10 @@ write(sampleT, file = file.path("samples", "Twitter.txt"))
 docs <- VCorpus(DirSource("samples", encoding = "UTF-8"),
                 readerControl = list(language = "en"))
 d.init <- docs #saving initial state of Corpus
-docs <- d.init
+#docs <- d.init
 
-names(docs)
-inspect(docs)
-docs[[1]][[1]][5]
+#inspect(docs)
+#docs[[1]][[1]][5]
 
 
 docs <- tm_map(docs, content_transformer(tolower))
@@ -104,79 +111,80 @@ docs <- tm_map(docs, removeWords, stopwords("english"))
 docs <- tm_map(docs, removePunctuation)   
 docs <- tm_map(docs, removeNumbers)   
 docs <- tm_map(docs, stripWhitespace)
-d <- docs #saving copy
+d <- docs #saving copy of non-stemmed
 docs <- tm_map(docs, stemDocument)
-
 
 if( !class(docs[[1]])[1] == "PlainTextDocument" ) {
     docs <- tm_map(docs, PlainTextDocument)
     #this one truncates the IDs of documents, so we use it only if necessary
 }
 
-
-
 ##################################
 # Staging & exploring
 ##################################
 
+#creating TDM
+
+ptm <- proc.time()
 tdm <- TermDocumentMatrix(docs)
+paste0("TDM with samples size ", 
+       sampleSize,
+       " took ",
+       round((proc.time() - ptm)[1], 2),
+       " sec")
 tdm
 inspect(tdm[2000:2020, 1:3])
 
+#words by frequency
 freq <- sort(rowSums(as.matrix(tdm)), decreasing=TRUE)   
-head(freq, 14)
 
-wf <- data.frame(word=names(freq), freq=freq)   
-head(wf)
+freq.b <- sort(as.matrix(tdm)[,1], decreasing=TRUE) #only blogs
+freq.n <- sort(as.matrix(tdm)[,2], decreasing=TRUE) #only news
+freq.t <- sort(as.matrix(tdm)[,3], decreasing=TRUE) #only twitter
 
 ##########################
 ## Plot Word Frequencies
 ##########################
 
+#function for plotting
+plot_w_freq <- function(data, min.freq, title) {
+    
+    wf <- data.frame(word = names(data), 
+                     freq = data)
+    
+    ggplot(subset(wf, freq > min.freq), 
+           aes(x = reorder(word, freq, function(x){x*-1}), 
+               y = freq)) +
+        geom_bar(stat = "identity") + 
+        theme(axis.text.x = element_text(angle = 90, vjust = 0),
+              plot.title = element_text(hjust = 0.5),
+              axis.title.x = element_blank()) +
+        ggtitle(title) + ylab("Frequency")
+}
 
-p <- ggplot(subset(wf, freq > 5000), aes(x = reorder(word, -freq), y = freq)) +
-    geom_bar(stat = "identity") + 
-    theme(axis.text.x=element_text(angle=45, hjust=1))
-p 
 
-##############################
-## Relationships Between Terms
-##############################
+plot_w_freq(freq, 15000, "Global most frequent words")
+plot_w_freq(freq.b, 7000, "Most frequent words in blogs")
+plot_w_freq(freq.n, 5000, "Most frequent words in news")
+plot_w_freq(freq.t, 4000, "Most frequent words in Twitter")
 
-#findAssocs(tdm, c("said" , "will"), corlimit=0.85) 
-
-
-##############
+###############
 ## Word Clouds
-##############
+###############
 
 set.seed(123)   
-wordcloud(names(freq), freq, min.freq=2000, scale=c(5, .1), rot.per=0.3,
-          colors=brewer.pal(6, "Dark2"))  
+wordcloud(names(freq), freq, min.freq=7000, scale=c(5, .1), rot.per=0.3,
+          colors=brewer.pal(6, "Dark2")) #all
+
+wordcloud(names(freq.b), freq.b, min.freq=3000, scale=c(4, .1), rot.per=0.3,
+          colors=brewer.pal(6, "Dark2")) #blogs
+
+wordcloud(names(freq.n), freq.n, min.freq=2000, scale=c(5, .1), rot.per=0.3,
+          colors=brewer.pal(6, "Dark2")) #news
+
+wordcloud(names(freq.t), freq.t, min.freq=1000, scale=c(4, .1), rot.per=0.3,
+          colors=brewer.pal(6, "Dark2")) #twitter
 
 
-################################
-# Clustering by Term Similarity
-################################
-
-tdms <- removeSparseTerms(tdm, 0.15) 
-tdms
-
-#Hierarchal Clustering
-
-#First calculate distance between words & then cluster them according to similarity.
-d <- dist(tdms, method="euclidian")   
-fit <- hclust(d=d, method="complete")   # for a different look: method="ward.D"
-fit  
-
-#let's look at 6 clusters level 
-plot(fit, hang=-1)
-groups <- cutree(fit, k=6)   # "k=" defines the number of clusters you are using   
-rect.hclust(fit, k=6, border="red") # draw dendogram with red borders around the 6 clusters   
-
-###############################
-# K-means clustering
-###############################
-
-kfit <- kmeans(d, 2)   
-clusplot(as.matrix(d), kfit$cluster, color=T, shade=T, labels=2, lines=0)
+#closing the log file
+sink()
