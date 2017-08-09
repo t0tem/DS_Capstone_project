@@ -1,14 +1,14 @@
-# initiating a log file
+#initiating a folder
+if(!dir.exists("data")) {dir.create("data")}
+setwd("data")
 
+# initiating a log file
 sink("log.txt", append = TRUE, split = TRUE)
 "Analysis started at"
 Sys.time()
 
 
-
-
 #loading libraries
-
 library(stringr)
 library(tm)
 library(ggplot2)
@@ -16,17 +16,12 @@ library(wordcloud)
 library(cluster)   
 library(fpc)  
 
-
 #downloading dataset
-if(!dir.exists("data")) {dir.create("data")}
-setwd("data")
-
 if (!file.exists("Coursera-SwiftKey.zip")) {
     link <- "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip"
     #print("hi")
     download.file(link, "Coursera-SwiftKey.zip")
 }
-
 
 #making the paths
 archv <- "Coursera-SwiftKey.zip"
@@ -66,13 +61,9 @@ con <- file(extrF[3], open = "rb")
 twitter <- readLines(con, encoding = "UTF-8", skipNul = TRUE)
 close(con)
 
-#news[77259]
-#str_replace_all(blogs[591457:591459], "[^[:graph:]]", " ") #for a test
-
-
 
 ## Sampling the files
-sampleSize <- 150000
+sampleSize <- 50000
 set.seed(456789)
 sampleN <- sample(news, sampleSize)
 sampleB <- sample(blogs, sampleSize)
@@ -88,9 +79,16 @@ proc.time() - ptm
 
 ## Storing the samples in the files 
 if(!dir.exists("samples")) {dir.create("samples")}
-write(sampleB, file = file.path("samples", "Blogs.txt"))
-write(sampleN, file = file.path("samples", "News.txt"))
-write(sampleT, file = file.path("samples", "Twitter.txt"))
+
+saveSmpl <- function(data, fname) {
+    con <- file(file.path("samples", fname), encoding = "UTF-8")
+    write(data, file = con)
+    close(con)
+}
+
+saveSmpl(sampleB, "Blogs.txt")
+saveSmpl(sampleN, "News.txt")
+saveSmpl(sampleT, "Twitter.txt")
 
 
 ####################################
@@ -101,10 +99,6 @@ docs <- VCorpus(DirSource("samples", encoding = "UTF-8"),
                 readerControl = list(language = "en"))
 d.init <- docs #saving initial state of Corpus
 #docs <- d.init
-
-#inspect(docs)
-#docs[[1]][[1]][5]
-
 
 docs <- tm_map(docs, content_transformer(tolower))
 docs <- tm_map(docs, removeWords, stopwords("english"))  
@@ -163,28 +157,27 @@ plot_w_freq <- function(data, min.freq, title) {
 }
 
 
-plot_w_freq(freq, 15000, "Global most frequent words")
-plot_w_freq(freq.b, 7000, "Most frequent words in blogs")
-plot_w_freq(freq.n, 5000, "Most frequent words in news")
-plot_w_freq(freq.t, 4000, "Most frequent words in Twitter")
+plot_w_freq(freq, 5000, "Global most frequent words")
+plot_w_freq(freq.b, 2000, "Most frequent words in blogs")
+plot_w_freq(freq.n, 1700, "Most frequent words in news")
+plot_w_freq(freq.t, 1300, "Most frequent words in Twitter")
 
 ###############
 ## Word Clouds
 ###############
 
 set.seed(123)   
-wordcloud(names(freq), freq, min.freq=7000, scale=c(5, .1), rot.per=0.3,
+wordcloud(names(freq), freq, min.freq=2000, scale=c(5, .1), rot.per=0.3,
           colors=brewer.pal(6, "Dark2")) #all
 
-wordcloud(names(freq.b), freq.b, min.freq=3000, scale=c(4, .1), rot.per=0.3,
+wordcloud(names(freq.b), freq.b, min.freq=1000, scale=c(4, .1), rot.per=0.3,
           colors=brewer.pal(6, "Dark2")) #blogs
 
-wordcloud(names(freq.n), freq.n, min.freq=2000, scale=c(5, .1), rot.per=0.3,
+wordcloud(names(freq.n), freq.n, min.freq=700, scale=c(5, .1), rot.per=0.3,
           colors=brewer.pal(6, "Dark2")) #news
 
-wordcloud(names(freq.t), freq.t, min.freq=1000, scale=c(4, .1), rot.per=0.3,
+wordcloud(names(freq.t), freq.t, min.freq=300, scale=c(4, .1), rot.per=0.3,
           colors=brewer.pal(6, "Dark2")) #twitter
-
 
 #closing the log file
 sink()
