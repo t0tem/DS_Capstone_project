@@ -52,6 +52,9 @@ sentences <- tokens(corp, what = "sentence", remove_separators = FALSE, verbose 
 
 sentences <- as.character(sentences)
 
+#save(sentences, file = 'sentences.RData')
+load('sentences.Rdata')
+
 #n-grams creation
 n1 <- tokens(sentences, what = "word", remove_numbers = TRUE,
                 remove_punct = TRUE, remove_symbols = TRUE, remove_separators = TRUE,
@@ -59,8 +62,8 @@ n1 <- tokens(sentences, what = "word", remove_numbers = TRUE,
                 ngrams = 1L, verbose = TRUE)
 
 n1 <- tokens_tolower(n1)
-n1 <- tokens_remove(n1, stopwords("english"))
-n1 <- tokens_wordstem(n1, language = "english")
+#n1 <- tokens_remove(n1, stopwords("english"))
+#n1 <- tokens_wordstem(n1, language = "english")
 
 n2 <- tokens_ngrams(n1, n = 2L, concatenator = " ")
 n3 <- tokens_ngrams(n1, n = 3L, concatenator = " ")
@@ -106,4 +109,27 @@ head(dt3[order(-count)], 20)
 
 dt4 <- data.table(ngram = featnames(d4), count = colSums(d4))
 head(dt4[order(-count)], 30)
+
+
+#making splitted DTs
+dt4.orig <- copy(dt4)
+
+dt4[, c("w1", "w2", "w3", "w4") := 
+        tstrsplit(ngram, " ", fixed = TRUE)][, ngram := NULL]
+
+    #change order of fields, sorting
+setcolorder(dt4, c(2:5, 1))
+dt4 <- dt4[order(-count)]
+
+save(dt4, file = "dt4.RData")
+load("dt4.RData")
+
+
+#testing the simpliest model of just subsetting DT by last 3 input words
+string <- "I go to the gym to "
+v1 <- "the"
+v2 <- "gym"
+v3 <- "to"
+
+dt4[w1 == v1][w2 == v2][w3 == v3]  #[1, w4]
 
