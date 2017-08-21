@@ -24,6 +24,11 @@ sampleN <- sample(news, sampleSize)
 sampleB <- sample(blogs, sampleSize)
 sampleT <- sample(twitter, sampleSize)
 
+    #trying with whole files
+#sampleN <- news
+#sampleB <- blogs
+#sampleT <- twitter
+
 
 ## cleaning samples from found issues (see 'issues_in_text.R')
 sampleN <- iconv(sampleN, from = "UTF-8", sub = "")
@@ -47,33 +52,56 @@ saveSmpl(sampleT, "Twitter.txt")
 
 #corpus creation
 corp <- corpus(readtext("samples/*.txt", encoding = "UTF-8"))
+#save(corp, file = "corp.RData")
+#load("corp.RData")
 
+ptm <- proc.time()
 sentences <- tokens(corp, what = "sentence", remove_separators = FALSE, verbose = TRUE)
+(sentences.time <- proc.time() - ptm)
 
 sentences <- as.character(sentences)
 
-#save(sentences, file = 'sentences.RData')
+save(sentences, file = 'sentences.RData')
 load('sentences.Rdata')
 
 #n-grams creation
+ptm <- proc.time()
 n1 <- tokens(sentences, what = "word", remove_numbers = TRUE,
                 remove_punct = TRUE, remove_symbols = TRUE, remove_separators = TRUE,
                 remove_twitter = TRUE, remove_hyphens = TRUE, remove_url = TRUE,
                 ngrams = 1L, verbose = TRUE)
+(n1.time <- proc.time() - ptm)
 
 n1 <- tokens_tolower(n1)
 #n1 <- tokens_remove(n1, stopwords("english"))
 #n1 <- tokens_wordstem(n1, language = "english")
 
+save(n1, file = 'n1.RData')
+load('n1.Rdata')
+
 n2 <- tokens_ngrams(n1, n = 2L, concatenator = " ")
+save(n2, file = 'n2.RData')
+load('n2.Rdata')
+
 n3 <- tokens_ngrams(n1, n = 3L, concatenator = " ")
+save(n3, file = 'n3.RData')
+load('n3.Rdata')
+
 n4 <- tokens_ngrams(n1, n = 4L, concatenator = " ")
+save(n4, file = 'n4.RData')
+load('n4.Rdata')
 
 #data-features matrices creation
 d1 <- dfm(n1, tolower = FALSE)
+save(d1, file = 'd1.RData')
+#load('d1.Rdata')
+
 d2 <- dfm(n2, tolower = FALSE)
 d3 <- dfm(n3, tolower = FALSE)
+
 d4 <- dfm(n4, tolower = FALSE)
+save(d4, file = 'd4.RData')
+#load('d4.Rdata')
 
 #checking top features
 topfeatures(d1, 20)
@@ -107,12 +135,10 @@ head(dt2[order(-count)], 20)
 dt3 <- data.table(ngram = featnames(d3), count = colSums(d3))
 head(dt3[order(-count)], 20)
 
+
+#DT for 4-gram
 dt4 <- data.table(ngram = featnames(d4), count = colSums(d4))
 head(dt4[order(-count)], 30)
-
-
-#making splitted DTs
-dt4.orig <- copy(dt4)
 
 dt4[, c("w1", "w2", "w3", "w4") := 
         tstrsplit(ngram, " ", fixed = TRUE)][, ngram := NULL]
@@ -121,15 +147,23 @@ dt4[, c("w1", "w2", "w3", "w4") :=
 setcolorder(dt4, c(2:5, 1))
 dt4 <- dt4[order(-count)]
 
-save(dt4, file = "dt4.RData")
-load("dt4.RData")
+#save(dt4, file = "dt4.RData")
+#load("dt4.RData")
 
 
 #testing the simpliest model of just subsetting DT by last 3 input words
 string <- "I go to the gym to "
-v1 <- "the"
-v2 <- "gym"
-v3 <- "to"
+v1 <- "work"
+v2 <- "out"
+v3 <- "great"
 
+addword <- function(word) {
+    v1 <<- v2
+    v2 <<- v3
+    v3 <<- word
+}
+
+addword("feeling")
 dt4[w1 == v1][w2 == v2][w3 == v3]  #[1, w4]
+
 
