@@ -5,7 +5,21 @@ Vadim K.
 
 
 ## Synopsis
-в чем цель
+
+The purpose of this document is to provide a milestone report on developing an 
+interactive text prediction web app.  
+This developement is a part of capstone project that 
+wraps up Coursera Data Science specialization offered by Johns Hopkins University (Baltimore, Maryland).
+
+This application will predict the next word a user most likely will type 
+based on the words he/she already typed.  
+The server part of application will run a word prediction algorithm that will be finalized later in the project. 
+This algorithm is based on N-gram language model built from [HC Corpora](https://web-beta.archive.org/web/20160930083655/http://www.corpora.heliohost.org/aboutcorpus.html) (a set of files with millions lines of text in different languages collected from publicly available sources by a web crawler).
+
+In the present document I will give a brief overview of the first steps of the project 
+that were already achieved such as downloading, cleaning and exploring the data. 
+I will also share couple of issues I faced and some interesting findings in the data.  
+In conclusion you'll find some info about my plans for creating the prediction algorithm and the expected constraints.
 
 
 ## Data Processing
