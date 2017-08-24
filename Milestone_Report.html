@@ -128,7 +128,7 @@ $(document).ready(function () {
 <div id="synopsis" class="section level2">
 <h2>Synopsis</h2>
 <p>The purpose of this document is to provide a milestone report on developing an interactive text prediction web app.<br />
-This developement is a part of capstone project that wraps up Coursera Data Science specialization offered by Johns Hopkins University (Baltimore, Maryland).</p>
+This developement is a part of the capstone project that wraps up Coursera Data Science specialization offered by Johns Hopkins University (Baltimore, Maryland).</p>
 <p>This application will predict the next word a user most likely will type based on the words he/she already typed.<br />
 The server part of application will run a word prediction algorithm that will be finalized later in the project. This algorithm is based on N-gram language model built from <a href="https://web-beta.archive.org/web/20160930083655/http://www.corpora.heliohost.org/aboutcorpus.html">HC Corpora</a> (a set of files with millions lines of text in different languages collected from publicly available sources by a web crawler).</p>
 <p>In the present document I will give a brief overview of the first steps of the project that were already achieved such as downloading, cleaning and exploring the data. I will also share couple of issues I faced and some interesting findings in the data.<br />
@@ -136,21 +136,70 @@ In conclusion you’ll find some info about my plans for creating the prediction
 </div>
 <div id="data-processing" class="section level2">
 <h2>Data Processing</h2>
-<p>библиотеки</p>
-<div id="loading-data" class="section level3">
-<h3><em>Loading Data</em></h3>
-<p>описываем что была проблема из-за символов <em>Issue found (and solved) on loading</em> решаем и грузим</p>
+<p>The R packages used during analysis are</p>
+<pre><code>library(stringr) # to count words
+library(stringi) # to count max characters (seems faster than stringr)
+library(dplyr) # to rename columns of summary table
+library(readtext) # to read sample file into a Corpus
+library(quanteda) # for all the text mining
+library(data.table) # to hold the frequency tables</code></pre>
+<div id="loading-data" class="section level4">
+<h4><em>Loading Data</em></h4>
+<p>The data was obtained from the archive available under following <a href="https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip">link</a>.<br />
+It contains texts from 3 types of sources (blogs, news, Twitter) in 4 different locales (en_US, de_DE, ru_RU and fi_FI).<br />
+Files in English were taken for this project (i.e. <code>&quot;en_US.blogs.txt&quot;; &quot;en_US.news.txt&quot;; &quot;en_US.twitter.txt&quot;</code>).</p>
+<p><span style="color:gray"> <em>There was an issue with loading News file: it containes ASCII <code>Substitute</code> character on line 77259, this character (decimal 26 or 0x1A) corresponds to Ctrl+Z in Windows so <code>readLines</code> function truncates the file at it and imports only 77259 lines.<br />
+Solution is to launch <code>readLines</code> in binary mode (credits to <a href="https://stackoverflow.com/questions/15874619/reading-in-a-text-file-with-a-sub-1a-control-z-character-in-r-on-windows">this Q on StackOverflow</a>)</em> </span></p>
 </div>
-<div id="summary-statistics" class="section level3">
-<h3><em>Summary statistics</em></h3>
-<p>графики с общим количеством строк, символов, размером файлов</p>
+<div id="summary-statistics" class="section level4">
+<h4><em>Summary statistics</em></h4>
+<p>Here is some summary statistics for the chosen files:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="left">File size</th>
+<th align="right">Total lines</th>
+<th align="right">Max. character per line</th>
+<th align="right">Total words</th>
+<th align="right">Av. character per word</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>en_US.blogs.txt</td>
+<td align="left">248.5 Mb</td>
+<td align="right">899288</td>
+<td align="right">40833</td>
+<td align="right">37874365</td>
+<td align="right">4.3</td>
+</tr>
+<tr class="even">
+<td>en_US.news.txt</td>
+<td align="left">249.6 Mb</td>
+<td align="right">1010242</td>
+<td align="right">11384</td>
+<td align="right">34613673</td>
+<td align="right">4.6</td>
+</tr>
+<tr class="odd">
+<td>en_US.twitter.txt</td>
+<td align="left">301.4 Mb</td>
+<td align="right">2360148</td>
+<td align="right">140</td>
+<td align="right">30556137</td>
+<td align="right">4.1</td>
+</tr>
+</tbody>
+</table>
+<hr />
 </div>
-<div id="sampling-data" class="section level3">
-<h3>Sampling Data</h3>
+<div id="sampling-data" class="section level4">
+<h4><em>Sampling Data</em></h4>
 <p>делаем сэмпл</p>
 </div>
-<div id="cleaning-data" class="section level3">
-<h3><em>Cleaning Data</em></h3>
+<div id="cleaning-data" class="section level4">
+<h4><em>Cleaning Data</em></h4>
 <p><em>Issue found (and solved) on samples</em> описываем и чистим сохраняем сэмплы для дальнейшего использования</p>
 </div>
 </div>

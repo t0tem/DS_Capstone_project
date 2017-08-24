@@ -8,7 +8,7 @@ Vadim K.
 
 The purpose of this document is to provide a milestone report on developing an 
 interactive text prediction web app.  
-This developement is a part of capstone project that 
+This developement is a part of the capstone project that 
 wraps up Coursera Data Science specialization offered by Johns Hopkins University (Baltimore, Maryland).
 
 This application will predict the next word a user most likely will type 
@@ -23,23 +23,55 @@ In conclusion you'll find some info about my plans for creating the prediction a
 
 
 ## Data Processing
-библиотеки
 
 
-### _Loading Data_
 
-описываем что была проблема из-за символов
-_Issue found (and solved) on loading_
-решаем и грузим
+The R packages used during analysis are
 
 
-### _Summary statistics_
-графики с общим количеством строк, символов, размером файлов
+```{}
+library(stringr) # to count words
+library(stringi) # to count max characters (seems faster than stringr)
+library(dplyr) # to rename columns of summary table
+library(readtext) # to read sample file into a Corpus
+library(quanteda) # for all the text mining
+library(data.table) # to hold the frequency tables
+```
 
-### Sampling Data
+
+#### _Loading Data_
+
+The data was obtained from the archive available under following [link](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip).  
+It contains texts from 3 types of sources (blogs, news, Twitter) in 4 different locales (en_US, de_DE, ru_RU and fi_FI).  
+Files in English were taken for this project (i.e. `"en_US.blogs.txt"; "en_US.news.txt"; "en_US.twitter.txt"`).  
+
+
+<span style="color:gray">
+_There was an issue with loading News file: it containes ASCII `Substitute` character on line 77259, 
+this character (decimal 26 or 0x1A) corresponds to Ctrl+Z in Windows so `readLines` function truncates the file at it and imports only 77259 lines.  
+Solution is to launch `readLines` in binary mode (credits to  [this Q on StackOverflow](https://stackoverflow.com/questions/15874619/reading-in-a-text-file-with-a-sub-1a-control-z-character-in-r-on-windows))_
+</span>
+
+
+
+#### _Summary statistics_
+Here is some summary statistics for the chosen files:
+
+
+                    File size    Total lines   Max. character per line   Total words   Av. character per word
+------------------  ----------  ------------  ------------------------  ------------  -----------------------
+en_US.blogs.txt     248.5 Mb          899288                     40833      37874365                      4.3
+en_US.news.txt      249.6 Mb         1010242                     11384      34613673                      4.6
+en_US.twitter.txt   301.4 Mb         2360148                       140      30556137                      4.1
+
+
+****************
+
+
+#### _Sampling Data_
 делаем сэмпл
 
-### _Cleaning Data_
+#### _Cleaning Data_
 _Issue found (and solved) on samples_
 описываем и чистим
 сохраняем сэмплы для дальнейшего использования
