@@ -36,6 +36,7 @@ library(dplyr) # to rename columns of summary table
 library(readtext) # to read sample file into a Corpus
 library(quanteda) # for all the text mining
 library(data.table) # to hold the frequency tables
+library(ggplot2) # visualization
 ```
 
 
@@ -48,7 +49,7 @@ Files in English were taken for this project (i.e. `"en_US.blogs.txt"; "en_US.ne
 
 <span style="color:gray">
 _There was an issue with loading News file: it containes ASCII `Substitute` character on line 77259, 
-this character (decimal 26 or 0x1A) corresponds to Ctrl+Z in Windows so `readLines` function truncates the file at it and imports only 77259 lines.  
+this character (decimal 26 or 0x1A) corresponds to Ctrl+Z in Windows so the function `readLines` truncates the file at it and imports only 77259 lines.  
 Solution is to launch `readLines` in binary mode (credits to  [this Q on StackOverflow](https://stackoverflow.com/questions/15874619/reading-in-a-text-file-with-a-sub-1a-control-z-character-in-r-on-windows))_
 </span>
 
@@ -68,23 +69,53 @@ en_US.twitter.txt   301.4 Mb         2360148                       140      3055
 ****************
 
 
-#### _Sampling Data_
-делаем сэмпл
+#### _Sampling & Cleaning the Data_
 
-#### _Cleaning Data_
-_Issue found (and solved) on samples_
-описываем и чистим
-сохраняем сэмплы для дальнейшего использования
+As the files are pretty big for the further analysis samples of 100k lines 
+were taken from each of them.
+
+I also had to do another cleaning for the sample files, as after the first round of 
+exploratory analysis some strange word pairs were discovered among the most popular ones 
+(e.g. `"u 009f"`).  
+After tracing back the issue many lines with non-ASCII characters were found  
+
+they looked like this in R (being read in binary mode)  
+`"Girls night with and ! \xf0\u009f\u0092\u009c"`  
+
+and like this in the original txt file  
+`Girls night with and ! ðŸ’œ`  
+<span style="color:gray">_Example from line #1054179 of Twitter file_</span>
+
 
 ## Exploring the Data
 
-чтобы продолжить разобьем на предложения
-и потом токены (в целях exploring уберем stop words и сделаем стеммы, потом для
-предсказания не будем)
-и потом dfm
-и потом частоты
+For exploring the data I experimented with 3 different packages (`tm`, `tidytext` and `quanteda`).  
+Personally I found 'quanteda' the most convenient for this project, so all the further text mining is done with it.  
 
-графики
+Also two different approaches were studied of taking the 3 files separately or combining them together. 
+The decision was to combine.  
+
+So the following steps were done on text mining stage:  
+
+* The Corpus has been read with `readtext`
+* Split into sentences (I found it more logical for further tokenization to treat each sentence separately
+not just each line) --> so we got **459 794 sentences**
+* Sentences then were split by words (1-gram 'tokens' object) and following transformation done:
+    + numbers, punctuation and different symbols removed
+    + all words to lower case
+    + English stop words removed <span style="color:gray">_(For the sake of exploring and building word clouds. Won't do this for prediction algorithm)_</span>
+    + Stemming applied <span style="color:gray">_(btw I find quanteda stemming being the most efficient one)_</span>
+* 2 more 'tokens' objects were created (holding 2- and 3-grams respectively)
+* Document-feature matrices created from 'tokens' objects, holding
+    +   **104 884 unique unigrams**
+    + **2 100 646 unique bigrams**
+    + **3 073 357 unique trigrams**
+* Data.tables were created to hold the frequences of n-grams and be used for further plotting  
+
+And below you can check-out the visualization of most popular n-grams in the studied dataset:
+
+![](Milestone_Report_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 
 ## Plans for Prediction Algorithm
 сам алгоритм построим на n-gram language model

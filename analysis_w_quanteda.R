@@ -4,6 +4,7 @@ library(data.table)
 library(stringr)
 library(stringi)
 library(dplyr)
+library(ggplot2)
 
 setwd("data")
 
@@ -116,8 +117,8 @@ sentences <- tokens(corp, what = "sentence", remove_separators = FALSE, verbose 
 
 sentences <- as.character(sentences)
 
-save(sentences, file = 'sentences.RData')
-load('sentences.Rdata')
+#save(sentences, file = 'sentences.RData')
+#load('sentences.Rdata')
 
 #n-grams creation
 ptm <- proc.time()
@@ -128,27 +129,27 @@ n1 <- tokens(sentences, what = "word", remove_numbers = TRUE,
 (n1.time <- proc.time() - ptm)
 
 n1 <- tokens_tolower(n1)
-#n1 <- tokens_remove(n1, stopwords("english"))
-#n1 <- tokens_wordstem(n1, language = "english")
+n1 <- tokens_remove(n1, stopwords("english"))
+n1 <- tokens_wordstem(n1, language = "english")
 
-save(n1, file = 'n1.RData')
-load('n1.Rdata')
+#save(n1, file = 'n1.RData')
+#load('n1.Rdata')
 
 n2 <- tokens_ngrams(n1, n = 2L, concatenator = " ")
-save(n2, file = 'n2.RData')
-load('n2.Rdata')
+#save(n2, file = 'n2.RData')
+#load('n2.Rdata')
 
 n3 <- tokens_ngrams(n1, n = 3L, concatenator = " ")
-save(n3, file = 'n3.RData')
-load('n3.Rdata')
+#save(n3, file = 'n3.RData')
+#load('n3.Rdata')
 
 n4 <- tokens_ngrams(n1, n = 4L, concatenator = " ")
-save(n4, file = 'n4.RData')
-load('n4.Rdata')
+#save(n4, file = 'n4.RData')
+#load('n4.Rdata')
 
 #data-features matrices creation
 d1 <- dfm(n1, tolower = FALSE)
-save(d1, file = 'd1.RData')
+#save(d1, file = 'd1.RData')
 #load('d1.Rdata')
 
 d2 <- dfm(n2, tolower = FALSE)
@@ -182,13 +183,21 @@ head(sentences[ind3])
 
 #storing frequencies in data.tables
 dt1 <- data.table(ngram = featnames(d1), count = colSums(d1))
-head(dt1[order(-count)], 20)
-
 dt2 <- data.table(ngram = featnames(d2), count = colSums(d2))
-head(dt2[order(-count)], 20)
-
 dt3 <- data.table(ngram = featnames(d3), count = colSums(d3))
-head(dt3[order(-count)], 20)
+
+
+dt1 <- head(dt1[order(-count)], 30)
+dt2 <- head(dt2[order(-count)], 30)
+dt3 <- head(dt3[order(-count)], 30)
+
+
+#saving data.tables to be used in milestone report (R markdown)
+save(dt1, file = "dt1.RData")
+save(dt2, file = "dt2.RData")
+save(dt3, file = "dt3.RData")
+
+
 
 
 #DT for 4-gram
@@ -207,7 +216,7 @@ dt4 <- dt4[order(-count)]
 
 
 #testing the simpliest model of just subsetting DT by last 3 input words
-string <- "I go to the gym to "
+string <- "I go to the gym to"
 v1 <- "work"
 v2 <- "out"
 v3 <- "great"
@@ -220,5 +229,3 @@ addword <- function(word) {
 
 addword("feeling")
 dt4[w1 == v1][w2 == v2][w3 == v3]  #[1, w4]
-
-
