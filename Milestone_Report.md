@@ -30,13 +30,14 @@ The R packages used during analysis are
 
 
 ```{}
-library(stringr) # to count words
-library(stringi) # to count max characters (seems faster than stringr)
-library(dplyr) # to rename columns of summary table
-library(readtext) # to read sample file into a Corpus
-library(quanteda) # for all the text mining
+library(stringr)    # to count words
+library(stringi)    # to count max characters (seems faster than stringr)
+library(dplyr)      # to rename columns of summary table
+library(readtext)   # to read sample file into a Corpus
+library(quanteda)   # for all the text mining
 library(data.table) # to hold the frequency tables
-library(ggplot2) # visualization
+library(ggplot2)    # frequencies visualization
+library(wordcloud)  # word clouds
 ```
 
 
@@ -135,7 +136,7 @@ among top 20 popular trigrams lead me to a very interesting reading on Wikipedia
 
 
 Another one was observing similar mentionings of Amazon among popular four-grams.
-Tracing back to original sentences showed that there are many intances of almost the same text mentioning blogs on wordpress with random-generated-looking names.  
+Tracing back to original sentences showed that there are many instances of almost the same text mentioning blogs on wordpress with random-generated-looking names.  
 See examples below:  
 
 <span style="color:gray">_
@@ -145,14 +146,20 @@ See examples below:
 "XVCYL Blog (xvcylblog.wordpress.com) is a participant in the Amazon Services LLC and Amazon EU Associates Programmes designed to provide a means for sites to earn advertising fees by advertising and linking to amazon.com, amazon.ca, amazon.co.uk, amazon.de, amazon.fr, amazon.it and amazon.es."_</span>  
 
 I visited couple of them - all empty, seem machine generated and differ just by title, 
-which is still always related to selling electonics.
+which is still always related to selling electronics. Looks like someone's affiliate marketing exercises :)
+
 
 ## Plans for Prediction Algorithm
-сам алгоритм построим на n-gram language model
-будем использовать 1-4-граммы и smooting (поэкспериментируем с Good-Turing and 
-Katz's back-of)
-ограничения:  
 
-* размеры итоговых таблиц (будем использовать data.table, как советуют fellow data scientists on course forum), 
-* оперативка на Shiny Server (1 RAM), для экспериментов может сделаем вирт.машину с подобными параметрами
+The final prediction algorithm will be based on N-gram language model. 
+Several tables will be built, containing n-grams accompanied with their probability rates. Next word will be proposed according to this rates.  In terms of parameters I'm now thinking to go till 5-grams, but this will depend on final accuracy tests.  
 
+The smoothing will also be implemented to handle unseen n-grams. I'm going to experiment with 
+Good-Turing and Katz's back-of and see what's better.  
+
+The final application will be done with `Shiny` package and hosted on shinyapps.io server.
+As hosting will be done under free account there can be limitations in terms of available RAM and server 
+performance. One of the solutions will be to use `data.table` as it was advised to be the most efficient to store the final tables.
+The tables will be also reduced as much as possible truncating low-frequency n-grams, it should still allow to keep up to 90% of word instances.  
+
+Thanks for reading. Stay tuned! ;)
