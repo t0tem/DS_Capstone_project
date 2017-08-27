@@ -5,6 +5,7 @@ library(stringr)
 library(stringi)
 library(dplyr)
 library(ggplot2)
+library(wordcloud)
 
 setwd("data")
 
@@ -40,7 +41,7 @@ total.words <- c(total.words.blogs,
                  total.words.twitter)
 
 #word characters count
-total.char <- sum(str_count(blogs, "[[:alpha:]]"))
+total.char.blogs <- sum(str_count(blogs, "[[:alpha:]]"))
 total.char.news <- sum(str_count(news, "[[:alpha:]]"))
 total.char.twitter <- sum(str_count(twitter, "[[:alpha:]]"))
 
@@ -117,8 +118,8 @@ sentences <- tokens(corp, what = "sentence", remove_separators = FALSE, verbose 
 
 sentences <- as.character(sentences)
 
-#save(sentences, file = 'sentences.RData')
-#load('sentences.Rdata')
+save(sentences, file = 'sentences.RData')
+load('sentences.Rdata')
 
 #n-grams creation
 ptm <- proc.time()
@@ -156,7 +157,7 @@ d2 <- dfm(n2, tolower = FALSE)
 d3 <- dfm(n3, tolower = FALSE)
 
 d4 <- dfm(n4, tolower = FALSE)
-save(d4, file = 'd4.RData')
+#save(d4, file = 'd4.RData')
 #load('d4.Rdata')
 
 #checking top features
@@ -185,34 +186,64 @@ head(sentences[ind3])
 dt1 <- data.table(ngram = featnames(d1), count = colSums(d1))
 dt2 <- data.table(ngram = featnames(d2), count = colSums(d2))
 dt3 <- data.table(ngram = featnames(d3), count = colSums(d3))
+dt4 <- data.table(ngram = featnames(d4), count = colSums(d4))
 
 
-dt1 <- head(dt1[order(-count)], 30)
-dt2 <- head(dt2[order(-count)], 30)
-dt3 <- head(dt3[order(-count)], 30)
+
+dt1 <- head(dt1[order(-count)], 200)
+dt2 <- head(dt2[order(-count)], 200)
+dt3 <- head(dt3[order(-count)], 200)
+dt4 <- head(dt4[order(-count)], 200)
 
 
 #saving data.tables to be used in milestone report (R markdown)
-save(dt1, file = "dt1.RData")
-save(dt2, file = "dt2.RData")
-save(dt3, file = "dt3.RData")
+save(list = c("dt1", "dt2", "dt3", "dt4"), file = "dt.RData")
+
+
+#plotting bars
+plot_n_gram <- function(data, title) {
+    ggplot(head(data, 30), aes(x = reorder(ngram, count), y = count)) +
+        geom_col() + 
+        theme(plot.title = element_text(hjust = 0.5),
+              axis.title.x = element_blank()) +
+        coord_flip() +
+        ggtitle(title) + xlab(NULL)
+}
+
+plot_n_gram(dt1, "Most frequent unigrams")
+plot_n_gram(dt2, "Most frequent bigrams")
+plot_n_gram(dt3, "Most frequent trigrams")
+plot_n_gram(dt4, "Most frequent four-grams")
+
+#plotting wordclouds
+plot_wcloud <- function(data, scale, n, title) {
+    layout(matrix(c(1, 2), nrow = 2), heights = c(1, 30))
+    par(mar = rep(0, 4))
+    plot.new()
+    text(x = 0.5, y = 0.5, title)
+    
+    wordcloud(words = data$ngram,
+          freq = data$count, 
+          colors = brewer.pal(6, "Dark2"), 
+          scale = c(scale, 0.2),
+          rot.per = 0.3,
+          max.words = n,
+          random.order = FALSE)
+}
+
+plot_wcloud(dt1, 5, 200, "Unigrams Word Cloud")
+plot_wcloud(dt2, 4, 120, "Bigrams Word Cloud")
 
 
 
 
-#DT for 4-gram
-dt4 <- data.table(ngram = featnames(d4), count = colSums(d4))
-head(dt4[order(-count)], 30)
-
+#splitting DT of 4-grams
 dt4[, c("w1", "w2", "w3", "w4") := 
         tstrsplit(ngram, " ", fixed = TRUE)][, ngram := NULL]
 
     #change order of fields, sorting
 setcolorder(dt4, c(2:5, 1))
 dt4 <- dt4[order(-count)]
-
-#save(dt4, file = "dt4.RData")
-#load("dt4.RData")
 
 
 #testing the simpliest model of just subsetting DT by last 3 input words

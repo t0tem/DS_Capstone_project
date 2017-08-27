@@ -59,11 +59,11 @@ Solution is to launch `readLines` in binary mode (credits to  [this Q on StackOv
 Here is some summary statistics for the chosen files:
 
 
-                    File size    Total lines   Max. character per line   Total words   Av. character per word
-------------------  ----------  ------------  ------------------------  ------------  -----------------------
-en_US.blogs.txt     248.5 Mb          899288                     40833      37874365                      4.3
-en_US.news.txt      249.6 Mb         1010242                     11384      34613673                      4.6
-en_US.twitter.txt   301.4 Mb         2360148                       140      30556137                      4.1
+                    File size    Total lines   Max. characters per line   Total words   Av. characters per word
+------------------  ----------  ------------  -------------------------  ------------  ------------------------
+en_US.blogs.txt     248.5 Mb          899288                      40833      37874365                       4.3
+en_US.news.txt      249.6 Mb         1010242                      11384      34613673                       4.6
+en_US.twitter.txt   301.4 Mb         2360148                        140      30556137                       4.1
 
 
 ****************
@@ -99,23 +99,53 @@ So the following steps were done on text mining stage:
 
 * The Corpus has been read with `readtext`
 * Split into sentences (I found it more logical for further tokenization to treat each sentence separately
-not just each line) --> so we got **459 794 sentences**
+not just each line) --> so we got **526 022 sentences**
 * Sentences then were split by words (1-gram 'tokens' object) and following transformation done:
     + numbers, punctuation and different symbols removed
     + all words to lower case
     + English stop words removed <span style="color:gray">_(For the sake of exploring and building word clouds. Won't do this for prediction algorithm)_</span>
     + Stemming applied <span style="color:gray">_(btw I find quanteda stemming being the most efficient one)_</span>
-* 2 more 'tokens' objects were created (holding 2- and 3-grams respectively)
+* 3 more 'tokens' objects were created (holding 2-, 3- and 4-grams respectively)
 * Document-feature matrices created from 'tokens' objects, holding
-    +   **104 884 unique unigrams**
-    + **2 100 646 unique bigrams**
-    + **3 073 357 unique trigrams**
+    +   **112 600 unique unigrams**
+    + **2 387 021 unique bigrams**
+    + **3 596 041 unique trigrams**
+    + **3 295 301 unique four-grams**
 * Data.tables were created to hold the frequences of n-grams and be used for further plotting  
 
 And below you can check-out the visualization of most popular n-grams in the studied dataset:
 
-![](Milestone_Report_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
 
+
+![](Milestone_Report_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+![](Milestone_Report_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+
+And here is another representation of unigrams and bigrams frequencies - by Word Clouds:
+
+
+
+![](Milestone_Report_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](Milestone_Report_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+#### _Couple of interesting findings in text_
+Being not from US or Mexico I was not familiar with the term 'Cinco de Mayo'. And finding it
+among top 20 popular trigrams lead me to a very interesting reading on Wikipedia :)  
+
+
+Another one was observing similar mentionings of Amazon among popular four-grams.
+Tracing back to original sentences showed that there are many intances of almost the same text mentioning blogs on wordpress with random-generated-looking names.  
+See examples below:  
+
+<span style="color:gray">_
+"JBFUA Blog (jbfuablog.wordpress.com) is a participant in the Amazon Services LLC and Amazon EU Associates Programmes designed to provide a means for sites to earn advertising fees by advertising and linking to amazon.com, amazon.ca, amazon.co.uk, amazon.de, amazon.fr, amazon.it and amazon.es."_</span>  
+
+<span style="color:gray">_
+"XVCYL Blog (xvcylblog.wordpress.com) is a participant in the Amazon Services LLC and Amazon EU Associates Programmes designed to provide a means for sites to earn advertising fees by advertising and linking to amazon.com, amazon.ca, amazon.co.uk, amazon.de, amazon.fr, amazon.it and amazon.es."_</span>  
+
+I visited couple of them - all empty, seem machine generated and differ just by title, 
+which is still always related to selling electonics.
 
 ## Plans for Prediction Algorithm
 сам алгоритм построим на n-gram language model
