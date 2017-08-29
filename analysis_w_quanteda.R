@@ -22,6 +22,9 @@ news <- read_file("en_US.news.txt")
 twitter <- read_file("en_US.twitter.txt")
 
 
+# Building files summary --------
+
+
 #file sizes
 f.sizes <- sapply(list(blogs, news, twitter), 
                   function(x) {format(object.size(x), "Mb")})
@@ -30,6 +33,8 @@ f.sizes <- sapply(list(blogs, news, twitter),
 total.lines <- c(length(blogs),
                  length(news),
                  length(twitter))
+
+
 
 #words count
 total.words.blogs <- sum(str_count(blogs, "[[:alpha:]]+"))
@@ -71,6 +76,10 @@ summary.table <- data.frame(f.sizes, total.lines, max.char, total.words, av.char
 #saving table to be used in milestone report (R markdown)
 save(summary.table, file = 'summary.table.RData')
 
+# end of building summary----
+
+
+
 
 ## Sampling the files
 sampleSize <- 100000
@@ -85,6 +94,7 @@ sampleT <- sample(twitter, sampleSize)
 #sampleN <- news
 #sampleB <- blogs
 #sampleT <- twitter
+#rm(list = c("news", "blogs", "twitter"))
 
 
 ## cleaning samples from found issues (see 'issues_in_text.R')
@@ -92,6 +102,7 @@ sampleN <- iconv(sampleN, from = "UTF-8", sub = "")
 sampleB <- iconv(sampleB, from = "UTF-8", sub = "")
 sampleT <- iconv(sampleT, from = "UTF-8", sub = "")
 
+# Saving samples ----
 
 ## Storing the samples in the files 
 if(!dir.exists("samples")) {dir.create("samples")}
@@ -106,9 +117,12 @@ saveSmpl(sampleB, "Blogs.txt")
 saveSmpl(sampleN, "News.txt")
 saveSmpl(sampleT, "Twitter.txt")
 
+# end of saving samples ----
+
 
 #corpus creation
 corp <- corpus(readtext("samples/*.txt", encoding = "UTF-8"))
+
 #save(corp, file = "corp.RData")
 #load("corp.RData")
 
@@ -118,8 +132,9 @@ sentences <- tokens(corp, what = "sentence", remove_separators = FALSE, verbose 
 
 sentences <- as.character(sentences)
 
-save(sentences, file = 'sentences.RData')
-load('sentences.Rdata')
+#save(sentences, file = 'sentences.RData')
+#load('sentences.Rdata')
+
 
 #n-grams creation
 ptm <- proc.time()
@@ -130,8 +145,8 @@ n1 <- tokens(sentences, what = "word", remove_numbers = TRUE,
 (n1.time <- proc.time() - ptm)
 
 n1 <- tokens_tolower(n1)
-n1 <- tokens_remove(n1, stopwords("english"))
-n1 <- tokens_wordstem(n1, language = "english")
+#n1 <- tokens_remove(n1, stopwords("english"))
+#n1 <- tokens_wordstem(n1, language = "english")
 
 #save(n1, file = 'n1.RData')
 #load('n1.Rdata')
