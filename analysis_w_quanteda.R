@@ -1,3 +1,6 @@
+# script for building Milestone report
+
+
 library(readtext)
 library(quanteda)
 library(data.table)
@@ -78,24 +81,12 @@ save(summary.table, file = 'summary.table.RData')
 
 # end of building summary----
 
-
-
-
 ## Sampling the files
 sampleSize <- 100000
 set.seed(456789)
 sampleN <- sample(news, sampleSize)
 sampleB <- sample(blogs, sampleSize)
 sampleT <- sample(twitter, sampleSize)
-
-
-
-    #trying with whole files
-#sampleN <- news
-#sampleB <- blogs
-#sampleT <- twitter
-#rm(list = c("news", "blogs", "twitter"))
-
 
 ## cleaning samples from found issues (see 'issues_in_text.R')
 sampleN <- iconv(sampleN, from = "UTF-8", sub = "")
@@ -118,7 +109,6 @@ saveSmpl(sampleN, "News.txt")
 saveSmpl(sampleT, "Twitter.txt")
 
 # end of saving samples ----
-
 
 #corpus creation
 corp <- corpus(readtext("samples/*.txt", encoding = "UTF-8"))
@@ -145,8 +135,8 @@ n1 <- tokens(sentences, what = "word", remove_numbers = TRUE,
 (n1.time <- proc.time() - ptm)
 
 n1 <- tokens_tolower(n1)
-#n1 <- tokens_remove(n1, stopwords("english"))
-#n1 <- tokens_wordstem(n1, language = "english")
+n1 <- tokens_remove(n1, stopwords("english"))
+n1 <- tokens_wordstem(n1, language = "english")
 
 #save(n1, file = 'n1.RData')
 #load('n1.Rdata')
@@ -164,16 +154,11 @@ n4 <- tokens_ngrams(n1, n = 4L, concatenator = " ")
 #load('n4.Rdata')
 
 #data-features matrices creation
-d1 <- dfm(n1, tolower = FALSE)
-#save(d1, file = 'd1.RData')
-#load('d1.Rdata')
 
+d1 <- dfm(n1, tolower = FALSE)
 d2 <- dfm(n2, tolower = FALSE)
 d3 <- dfm(n3, tolower = FALSE)
-
 d4 <- dfm(n4, tolower = FALSE)
-#save(d4, file = 'd4.RData')
-#load('d4.Rdata')
 
 #checking top features
 topfeatures(d1, 20)
@@ -204,12 +189,11 @@ dt3 <- data.table(ngram = featnames(d3), count = colSums(d3))
 dt4 <- data.table(ngram = featnames(d4), count = colSums(d4))
 
 
-
+#truncating DTs for further saving
 dt1 <- head(dt1[order(-count)], 200)
 dt2 <- head(dt2[order(-count)], 200)
 dt3 <- head(dt3[order(-count)], 200)
 dt4 <- head(dt4[order(-count)], 200)
-
 
 #saving data.tables to be used in milestone report (R markdown)
 save(list = c("dt1", "dt2", "dt3", "dt4"), file = "dt.RData")
@@ -230,6 +214,7 @@ plot_n_gram(dt2, "Most frequent bigrams")
 plot_n_gram(dt3, "Most frequent trigrams")
 plot_n_gram(dt4, "Most frequent four-grams")
 
+
 #plotting wordclouds
 plot_wcloud <- function(data, scale, n, title) {
     layout(matrix(c(1, 2), nrow = 2), heights = c(1, 30))
@@ -248,30 +233,3 @@ plot_wcloud <- function(data, scale, n, title) {
 
 plot_wcloud(dt1, 5, 200, "Unigrams Word Cloud")
 plot_wcloud(dt2, 4, 120, "Bigrams Word Cloud")
-
-
-
-
-#splitting DT of 4-grams
-dt4[, c("w1", "w2", "w3", "w4") := 
-        tstrsplit(ngram, " ", fixed = TRUE)][, ngram := NULL]
-
-    #change order of fields, sorting
-setcolorder(dt4, c(2:5, 1))
-dt4 <- dt4[order(-count)]
-
-
-#testing the simpliest model of just subsetting DT by last 3 input words
-string <- "I go to the gym to"
-v1 <- "work"
-v2 <- "out"
-v3 <- "great"
-
-addword <- function(word) {
-    v1 <<- v2
-    v2 <<- v3
-    v3 <<- word
-}
-
-addword("feeling")
-dt4[w1 == v1][w2 == v2][w3 == v3]  #[1, w4]
