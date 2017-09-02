@@ -1,5 +1,6 @@
 library(tidytext)
 library(dplyr)
+library(stringr)
 library(data.table)
 
 setwd("data")
@@ -41,6 +42,7 @@ Lexicon <- word_count %>% filter(n > 3) %>% .$word
 #checking Lexicon for weird stuff
 to_remove <- grep("[!\"#$%&()*+,-./:;<=>?@^_`|~.]", Lexicon, value = TRUE)
 Lexicon <- Lexicon[!Lexicon %in% to_remove]
+save(Lexicon, file = "full Rdata/Lexicon.RData")
 
 #there was smth important to correct in text found in Lexicon weird stuff
 #function for correction
@@ -68,3 +70,5 @@ lexiconed_text <- tidy_text %>% mutate_at("word", filter_lexicon)
 #function to assemble back the text
 norm_text <- data.table(lexiconed_text)[,.(text = paste(word, collapse = " ")), 
                                         by = line][, text]
+
+save(norm_text, file = "full RData/norm_text.RData")

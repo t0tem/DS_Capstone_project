@@ -154,7 +154,13 @@ system.time(get_scores(dt5))
 
 #prediction
 
-str <- c("you must be")
+load("full RData/dt2s.RData")
+load("full RData/dt3s.RData")
+load("full RData/dt4s.RData")
+load("full RData/dt5s.RData")
+load("full RData/Lexicon.RData")
+
+str <- c("all of Adam Sandler")
 
 #df <- data_frame(line = 1:length(str), text = str)
 
@@ -162,17 +168,17 @@ root4 <- data_frame(str) %>% unnest_tokens(word, str) %>%
     filter(!str_detect(word, "[\\d]")) %>% 
     mutate_at("word", filter_lexicon) %>% 
     #slice((n() - 3):n()) %>%
-    filter(row_number() > n()-5) %>%
+    filter(row_number() > n()-4) %>%
     .$word %>% paste(collapse = " ")
 root3 <- word(root4, start=-3, end = -1)
 root2 <- word(root4, start=-2, end = -1)
 root1 <- word(root4, start=-1, end = -1)
 
 
-dt5[root == root4]
-dt4[root == root3]
-dt3[root == root2]
-dt2[root == root1]
+dt5s[prediction == "morning"]
+dt4s[root == root3]
+dt3s[root == root2]
+dt2s[prediction == "financial"]
 
 ###this script appeared to be too slow when applied to the whole Corpus
 ###we'll use its' part for normalizing text, then will proceed with 'quanteda'
