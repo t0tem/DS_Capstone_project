@@ -47,7 +47,7 @@ predict.word <- function(str) {
         root2 <- paste(tail(split_str, 2), collapse = " ")
         
         add_cand <- head(
-            dt3[root == root2][, c("prediction", "score")][, score := 0.4*0,4*score],
+            dt3[root == root2][, c("prediction", "score")][, score := 0.4*0.4*score],
             3)
         dt_cand <- rbind(dt_cand, add_cand)
         
@@ -62,7 +62,7 @@ predict.word <- function(str) {
         root1 <- paste(tail(split_str, 1), collapse = " ")
         
         add_cand <- head(
-            dt2[root == root1][, c("prediction", "score")][, score := 0.4*0.4*0,4*score],
+            dt2[root == root1][, c("prediction", "score")][, score := 0.4*0.4*0.4*score],
             3)
         dt_cand <- rbind(dt_cand, add_cand)
         
