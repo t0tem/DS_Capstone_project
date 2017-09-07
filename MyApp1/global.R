@@ -1,0 +1,7 @@
+library(quanteda)
+library(data.table)
+load("dt2.Rda")
+load("dt3.Rda")
+load("dt4.Rda")
+load("dt5.Rda")
+source("prediction_function.R")

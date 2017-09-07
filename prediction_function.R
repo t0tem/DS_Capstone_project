@@ -11,7 +11,7 @@ predict.word <- function(str) {
     )
     
     #creating empty candidates DT
-    dt_cand <- data.table()
+    dt_cand <- data.table(prediction = character(), score = numeric())
     
     #checking 4gram root
     if (length(split_str) >= 4) {
@@ -19,7 +19,7 @@ predict.word <- function(str) {
         root4 <- paste(tail(split_str, 4), collapse = " ")
         
         add_cand <- head(dt5[root == root4][, c("prediction", "score")], 3)
-        new <- !add_cand[, prediction] %in% dt_cand #checking which ones are new
+        new <- !add_cand[, prediction] %in% dt_cand[, prediction] #checking which ones are new
         dt_cand <- rbind(dt_cand, add_cand[new])
         
         if (nrow(dt_cand) >= 3) {
@@ -35,7 +35,7 @@ predict.word <- function(str) {
         add_cand <- head(
             dt4[root == root3][, c("prediction", "score")][, score := 0.4*score], 
             3)
-        new <- !add_cand[, prediction] %in% dt_cand #checking which ones are new
+        new <- !add_cand[, prediction] %in% dt_cand[, prediction] #checking which ones are new
         dt_cand <- rbind(dt_cand, add_cand[new])
         
         if (nrow(dt_cand) >= 3) {
@@ -51,7 +51,7 @@ predict.word <- function(str) {
         add_cand <- head(
             dt3[root == root2][, c("prediction", "score")][, score := 0.4*0.4*score],
             3)
-        new <- !add_cand[, prediction] %in% dt_cand #checking which ones are new
+        new <- !add_cand[, prediction] %in% dt_cand[, prediction] #checking which ones are new
         dt_cand <- rbind(dt_cand, add_cand[new])
         
         if (nrow(dt_cand) >= 3) {
@@ -67,7 +67,7 @@ predict.word <- function(str) {
         add_cand <- head(
             dt2[root == root1][, c("prediction", "score")][, score := 0.4*0.4*0.4*score],
             3)
-        new <- !add_cand[, prediction] %in% dt_cand #checking which ones are new
+        new <- !add_cand[, prediction] %in% dt_cand[, prediction] #checking which ones are new
         dt_cand <- rbind(dt_cand, add_cand[new])
         
         if (nrow(dt_cand) >= 3) {
