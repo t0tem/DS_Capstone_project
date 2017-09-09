@@ -10,6 +10,10 @@ predict.word <- function(str) {
                remove_twitter = TRUE, remove_hyphens = TRUE, remove_url = TRUE))
     )
     
+    if (length(split_str) == 0) {
+        return(c("", "", ""))
+    }
+    
     #creating empty candidates DT
     dt_cand <- data.table(prediction = character(), score = numeric())
     
