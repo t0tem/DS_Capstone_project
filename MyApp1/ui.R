@@ -19,8 +19,10 @@ shinyUI(
                         max-width: 800px;
                         margin: 0 auto;",
                         
-                        textAreaInput("caption", label = "Text input", value = "", resize="vertical", placeholder = "type here..."),
-                        textInput("text", label = "Text input", value = "", placeholder = "type here..."),
+                        
+                        textAreaInput("text", label = "Text input", value = "", 
+                                      resize="vertical", rows = 2,
+                                      placeholder = "type here..."),
                         
                         actionButton("choice1", label = textOutput("word1")),
                         actionButton("choice2", label = textOutput("word2")),
