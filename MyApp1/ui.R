@@ -133,11 +133,24 @@ shinyUI(
                         border-radius: 5px;
                         max-width: 800px;
                         margin: 0 auto;",
-                    helpText("This app is done by"),
-                    helpText("Vadim KULAGIN. A Data Science enthusiast"),
-                    div(img(src="Photo.jpeg", width = "100%", style = "border-radius: 80px; max-width: 150px;"), style = "text-align: left;"),
-                    helpText("Any feedback and contribution is welcome on GitHub."),
-                    helpText("You can also reach out to me on LinkedIn.")
+                    helpText("This app was made by"),
+                    fluidRow(
+                        column(
+                            2, offset = 1,
+                            img(src="Photo.jpeg", width = "100%", style = "border-radius: 100%; max-width: 100px;")   
+                        ),
+                        column(
+                            8,
+                            p("Vadim KULAGIN", style = "font-size: 200%; 
+                              font-family: Permanent Marker; margin-top: 18px; margin-bottom: -4px;"),
+                            p(strong(em("a Data Scientist")), style = "font-size: 115%; font-family: Indie Flower;")
+                        )
+                    ),
+                    br(),
+                    helpText("Any feedback and contribution is welcome on ",
+                             a("GitHub.", href = "https://github.com/t0tem/DS_Capstone_project", target = "_blank"), 
+                             "You can also reach out to me on ", 
+                             a("LinkedIn.", href = "https://www.linkedin.com/in/vadim-kulagin-7b892095/", target = "_blank"))
                 )
             )
         ),
