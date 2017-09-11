@@ -163,7 +163,12 @@ shinyUI(
                         border: 1px solid #ccc;
                         border-radius: 5px;
                         max-width: 800px;
-                        margin: 0 auto;")
+                        margin: 0 auto;",
+                    helpText("1. Data Science Specialization on ",
+                             a("Coursera", href = "https://www.coursera.org/specializations/jhu-data-science", 
+                               target = "_blank")),
+                    helpText("")
+                )
             )
         )
     )
