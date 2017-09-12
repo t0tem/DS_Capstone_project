@@ -34,7 +34,7 @@ shinyUI(
                     
                     textAreaInput("text", label = "", value = "", 
                                   resize="vertical", rows = 2,
-                                  placeholder = "start typing something here..."),
+                                  placeholder = "Start typing something here. For example \"I want to\""),
                     p(em("Predicted words are shown below (leftmost is the most probable one)"), style = "font-size: 90%;"),
                     actionButton("choice1", label = textOutput("word1")),
                     actionButton("choice2", label = textOutput("word2")),
@@ -118,8 +118,8 @@ shinyUI(
                              strong("10-11 milliseconds"), " to run (which is quite fast) and 
                              uses only ", strong("146MB of RAM"), " on Shinyapps.io server."),
                     helpText("This result is one the highest reported on Coursera forum by the 
-                             students of Data Science Specialization.")
-                    
+                             students of Data Science Specialization. For comparison 
+                             SwiftKey's own industrial result is known to be around 30%.")
                 )
             )
         ),
@@ -165,9 +165,81 @@ shinyUI(
                         max-width: 800px;
                         margin: 0 auto;",
                     helpText("1. Data Science Specialization on ",
-                             a("Coursera", href = "https://www.coursera.org/specializations/jhu-data-science", 
+                             a("Coursera", 
+                               href = "https://www.coursera.org/specializations/jhu-data-science", 
+                               target = "_blank"),
+                             "(and that's the",
+                             a("dataset", 
+                               href = "https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip", 
+                               target = "_blank"),
+                             "used in the Capstone)."),
+                    helpText("2. Glorious course instructors:",
+                             a("Jeff Leek,", 
+                               href = "https://www.coursera.org/instructor/~694443", 
+                               target = "_blank"),
+                             a("Roger D. Peng,", 
+                               href = "https://www.coursera.org/instructor/rdpeng", 
+                               target = "_blank"),
+                             "and",
+                             a("Brian Caffo.", 
+                               href = "https://www.coursera.org/instructor/~688901", 
                                target = "_blank")),
-                    helpText("")
+                    helpText("3. Stanford lectures on Natural Language Procession by 
+                             Professor Dan Jurafsky & Chris Manning on ",
+                             a("Youtube.", 
+                               href = "https://www.youtube.com/watch?v=nfoudtpBV68&list=PL4LJlvG_SDpxQAwZYtwfXcQr7kGnl9W93", 
+                               target = "_blank")),
+                    helpText("4. Modern information theory track on ",
+                             a("KhanAcademy.", 
+                               href = "https://www.khanacademy.org/computing/computer-science/informationtheory/moderninfotheory/v/symbol-rate-information-theory", 
+                               target = "_blank")),
+                    helpText("5.",
+                             a("\"The Information\"", 
+                               href = "https://www.amazon.com/Information-History-Theory-Flood/dp/1400096235", 
+                               target = "_blank"),
+                        "by James Gleick - an amazing book on Theory of Information."),
+                    helpText("6.",
+                             a("\"Large Language Models in Machine Translation\"", 
+                               href = "http://www.aclweb.org/anthology/D07-1090.pdf", 
+                               target = "_blank"),
+                             "(Brants et al., 2007, Google Inc.) - a paper first 
+                             introducing Stupid backoff method."),
+                    helpText("7. Main R packages used on the project: ",
+                             a("quanteda,", 
+                               href = "http://quanteda.io/", 
+                               target = "_blank"),
+                             a("data.table,", 
+                               href = "https://cran.r-project.org/web/packages/data.table/data.table.pdf", 
+                               target = "_blank"),
+                             a("shiny.", 
+                               href = "https://shiny.rstudio.com/", 
+                               target = "_blank")),
+                    helpText("8.",
+                             a("RStudio", 
+                               href = "https://www.rstudio.com/", 
+                               target = "_blank"),
+                             "- the one and only IDE for R."),
+                    helpText("9.",
+                             a("Benchmarking tool", 
+                               href = "https://github.com/hfoffani/dsci-benchmark", 
+                               target = "_blank"),
+                             "created by Jan-San and Hernán Foffani."),
+                    helpText("10. ",
+                             a("Papr", 
+                               href = "https://shiny.rstudio.com/gallery/papr.html", 
+                               target = "_blank"),
+                             "- \"Tinder for pre-prints\", an app created by Jeff Leek, 
+                             the main source of inspiration for NextWordio web layout."),
+                    helpText("11.",
+                             a("Stack Overflow", 
+                               href = "https://stackoverflow.com/questions/tagged/r", 
+                               target = "_blank"),
+                             "- an endless source of knowledge and support."),
+                    helpText("12.",
+                             a("Free Logo Design", 
+                               href = "https://www.freelogodesign.org/index.html", 
+                               target = "_blank"),
+                             "- an easy way to have a nice logo online. For free.")
                 )
             )
         )

@@ -3,8 +3,8 @@ title: NextWordPrediction
 account: t0tem
 server: shinyapps.io
 appId: 211705
-bundleId: 975468
+bundleId: 978166
 url: https://t0tem.shinyapps.io/nextwordprediction/
-when: 1505076197.24711
+when: 1505215730.24308
 asMultiple: FALSE
 asStatic: FALSE
