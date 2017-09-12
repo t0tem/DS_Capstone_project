@@ -57,7 +57,7 @@ shinyUI(
                         margin: 0 auto;",
                     helpText("This App serves as a capstone project in Coursera 
                              Data Science Specialization provided by Johns Hopkins University.
-                             Swiftype company, the editor of SwiftKey predictive keyboard 
+                             SwiftKey - company developer of a predictive keyboard 
                              for Android and iOS acted as a corporate parner in this capstone, 
                              helping to formulate the real-world problematics behind the project idea."),
                     helpText("The App works thanks to a built-in prediction algorithm 
@@ -137,7 +137,7 @@ shinyUI(
                     fluidRow(
                         column(
                             2, offset = 1,
-                            img(src="Photo.jpeg", width = "100%", style = "border-radius: 100%; max-width: 100px;")   
+                            img(src="Photo.jpg", width = "100%", style = "border-radius: 100%; max-width: 100px;")   
                         ),
                         column(
                             8,
